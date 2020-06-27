@@ -8,22 +8,27 @@ int main()
   BMP_init(FALSE, BG_A, PAL0, FALSE);
   BMP_setBufferCopy(TRUE); // if we do not do this, the bitmap pixels and lines will flicker when drawing
 
-  //Set the colour of the line. We are using pallete 0 for the bitmap, so we have 0->15. 15 is used for white text, so we set an unused pallet colour, 14 to blue - RGB 0000FF. We also want a red line, so we set 12 to red - RGB FF0000. We may as well set green as well :)
+  //Set the colour of the line. We are using pallete 0 for the bitmap, so we have 0->15. 15 is used for white text, so we set an unused pallet colour, 14 to red - RGB FF0000. We also want a green line, so we set 13 to red - RGB FF0000.... etc etc....
   u16 colour_red = RGB24_TO_VDPCOLOR(0xff0000);
   u16 colour_green = RGB24_TO_VDPCOLOR(0x00ff00);
   u16 colour_blue = RGB24_TO_VDPCOLOR(0x0000ff);
-  VDP_setPaletteColor(12, colour_red);
+  u16 colour_yellow = RGB24_TO_VDPCOLOR(0xffff00);
+  VDP_setPaletteColor(14, colour_red);
   VDP_setPaletteColor(13, colour_green);
-  VDP_setPaletteColor(14, colour_blue);
+  VDP_setPaletteColor(12, colour_blue);
+  VDP_setPaletteColor(11, colour_yellow);
 
   //When we are working in bitmap mode, we must left shift the colours, or we get gaps in pixels drawn
-  int pal_red = 12;
+  int pal_red = 14;
   pal_red |= pal_red << 4;
 
   int pal_green = 13;
   pal_green |= pal_green << 4;
 
-  int pal_blue = 14;
+  int pal_blue = 12;
+  pal_blue |= pal_blue << 4;
+
+  int pal_yellow = 11;
   pal_blue |= pal_blue << 4;
 
   //Draw the vertical axis
@@ -58,6 +63,10 @@ int main()
         //We may as well draw cosine while we are here :)
         BMP_setPixel(i, 80 + cosFix16(i*8), pal_green);
 
+        //...and why not tan - but checking to make sure we don't divide by 0
+        if (cosFix16(i*8) != 0){
+          BMP_setPixel(i, 80 + (fix16Div(sinFix16(i*8), cosFix16(i*8))), pal_yellow);
+        }
         BMP_flip(FALSE);
       }
 
